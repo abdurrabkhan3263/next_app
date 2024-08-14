@@ -81,7 +81,6 @@ export async function fetchFilteredInvoices(
   currentPage: number
 ) {
   const offset = (currentPage - 1) * ITEMS_PER_PAGE;
-
   try {
     const invoices = await sql<InvoicesTable>`
       SELECT
@@ -123,7 +122,6 @@ export async function fetchInvoicesPages(query: string) {
       invoices.date::text ILIKE ${`%${query}%`} OR
       invoices.status ILIKE ${`%${query}%`}
   `;
-
     const totalPages = Math.ceil(Number(count.rows[0].count) / ITEMS_PER_PAGE);
     return totalPages;
   } catch (error) {
@@ -143,17 +141,18 @@ export async function fetchInvoiceById(id: string) {
       FROM invoices
       WHERE invoices.id = ${id};
     `;
-
     const invoice = data.rows.map((invoice) => ({
       ...invoice,
       // Convert amount from cents to dollars
       amount: invoice.amount / 100,
     }));
-
+    console.log(invoice);
     return invoice[0];
   } catch (error) {
-    console.error("Database Error:", error);
-    throw new Error("Failed to fetch invoice.");
+    console.log(error);
+    return {
+      message: error,
+    };
   }
 }
 
